@@ -1,26 +1,32 @@
 @startuml
 class Utilisateur {
-    - id : int
+    - id : Long
     - nom : String
     - prenom : String
     - email : String
     - motDePasse : String
     - isAdmin : boolean
     - isActif : boolean
-    + getChatsCrees() : List<Chat>
-    + getChatsInvites() : List<Chat>
 }
 
-class Chat {
-    - id : int
+class Canal {
+    - id : Long
     - titre : String
     - description : String
     - dateHoraire : LocalDateTime
     - dureeValidite : int
-    + getProprietaire() : Utilisateur
-    + getInvites() : List<Utilisateur>
 }
-' Relations
-Utilisateur "1" --> "*" Chat : crée
-Utilisateur "*" --> "*" Chat : est invité à
+
+class Message {
+    - contenu : String
+    - heure : LocalTime
+}
+
+' Relations liées à la gestion des canaux
+Utilisateur "1" <--> "*" Canal : crée
+Utilisateur "*" <--> "*" Canal : est invité à
+
+' Relations liées à la diffusion en temps réel (WebSocket)
+Message "*" --> "1" Canal : diffusé sur
+Message "*" --> "1" Utilisateur : envoyé par
 @enduml
