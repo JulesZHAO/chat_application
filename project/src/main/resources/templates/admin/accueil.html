@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<!-- L'attribut layout:decorate dit à cette page d'utiliser layout.html comme squelette -->
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{layout}">
+
+<head>
+    <title>Accueil - Liste des utilisateurs</title>
+</head>
+
+<body>
+
+    <!-- Tout ce qui est dans ce bloc va remplacer la balise <main> du layout.html -->
+    <main layout:fragment="content">
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3>Liste des utilisateurs</h3>
+            <!-- Lien vers le futur formulaire d'ajout -->
+            <a th:href="@{/admin/users/add}" class="btn btn-success">+ Nouveau</a>
+        </div>
+
+        <!-- Tableau Bootstrap pour afficher les données -->
+        <table class="table table-striped border">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Nom</th>
+                    <th>Prénom</th>
+                    <th>Email</th>
+                    <th>Rôle</th>
+                    <th>Statut</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Boucle Thymeleaf : génère une ligne <tr> pour chaque utilisateur dans la base -->
+                <tr th:each="user : ${utilisateurs}">
+                    <td th:text="${user.id}">1</td>
+                    <td th:text="${user.nom}">Dupont</td>
+                    <td th:text="${user.prenom}">Jean</td>
+                    <td th:text="${user.email}">jean.dupont@mail.com</td>
+
+                    <!-- Affichage conditionnel (opérateur ternaire) -->
+                    <td th:text="${user.isAdmin ? 'Admin' : 'Utilisateur'}">Utilisateur</td>
+
+                    <td>
+                        <span th:if="${user.isActif}" class="badge bg-success">Actif</span>
+                        <span th:unless="${user.isActif}" class="badge bg-danger">Désactivé</span>
+                    </td>
+
+                    <td>
+                        <!-- TODO : Modifier le code pour que les liens fonctionnent -->
+                        <a href="#" class="btn btn-sm btn-primary">Éditer</a>
+                        <a href="#" class="btn btn-sm btn-warning">Désactiver</a>
+                    </td>
+                </tr>
+
+                <!-- Message si la base de données est vide -->
+                <tr th:if="${#lists.isEmpty(utilisateurs)}">
+                    <td colspan="7" class="text-center text-muted">Aucun utilisateur trouvé.</td>
+                </tr>
+            </tbody>
+        </table>
+
+    </main>
+
+</body>
+
+</html>

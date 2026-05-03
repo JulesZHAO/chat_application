@@ -1,0 +1,64 @@
+/* Utilisation de Flexbox sur le body pour gérer la hauteur totale de la page */
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    /* Prend 100% de la hauteur de l'écran */
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+
+header {
+    background-color: #5b5b95;
+    /* Violet grisé */
+    color: white;
+    text-align: center;
+    padding-top: 10px;
+}
+
+nav {
+    background-color: #48487f;
+    padding: 10px;
+    text-align: left;
+}
+
+nav a {
+    color: white;
+    margin-right: 20px;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+nav a:hover {
+    text-decoration: underline;
+}
+
+/* Le wrapper utilise Flexbox pour aligner l'aside et le main côte à côte */
+.content-wrapper {
+    display: flex;
+    flex: 1;
+    /* Permet au bloc central de s'étirer pour pousser le footer en bas */
+}
+
+aside {
+    background-color: #c46c43;
+    /* Orange/Rouille */
+    color: black;
+    width: 250px;
+    padding: 20px;
+}
+
+main {
+    background-color: #eed6ce;
+    /* Beige/Saumon clair */
+    flex: 1;
+    /* Le main prend tout l'espace restant à droite de l'aside */
+    padding: 20px;
+}
+
+footer {
+    background-color: #5b5b95;
+    color: white;
+    text-align: center;
+    padding: 15px;
+}
