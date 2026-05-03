@@ -56,8 +56,8 @@
                     </td>
 
                     <td>
-                        <!-- TODO : Modifier le code pour que les liens fonctionnent -->
-                        <a href="#" class="btn btn-sm btn-primary">Éditer</a>
+                        <a th:href="@{/admin/users/editer/{id}(id=${user.id})}"
+                            class="btn btn-sm btn-primary">Éditer</a>
                         <a th:if="${user.isActif}" th:href="@{/admin/users/desactiver/{id}(id=${user.id})}"
                             class="btn btn-sm btn-warning">Désactiver</a>
                     </td>

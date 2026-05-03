@@ -59,6 +59,31 @@ public class AdminController {
         return "admin/accueil";
     }
 
+    @GetMapping("/admin/users/editer/{id}")
+    public String afficherFormulaireEdition(@PathVariable Long id, Model model) {
+        // On cherche l'utilisateur
+        Utilisateur utilisateur = utilisateurRepository.findById(id).orElse(null);
+
+        if (utilisateur == null) {
+            return "redirect:/admin"; // Sécurité : si l'ID n'existe pas, on retourne à l'accueil
+        }
+
+        // On envoie l'utilisateur trouvé au formulaire
+        model.addAttribute("utilisateur", utilisateur);
+        return "admin/edit-user";
+    }
+
+    @PostMapping("/admin/users/editer/{id}")
+    public String mettreAJourUtilisateur(@PathVariable Long id, @ModelAttribute Utilisateur utilisateur) {
+        // On s'assure que l'ID est bien conservé pour faire la maj
+        utilisateur.setId(id);
+
+        // On sauvegarde par-dessus l'ancien
+        utilisateurRepository.save(utilisateur);
+
+        return "redirect:/admin";
+    }
+
     @GetMapping("/admin/users/desactiver/{id}")
     public String desactiverUtilisateur(@PathVariable Long id) {
         // On cherche l'utilisateur par son ID
