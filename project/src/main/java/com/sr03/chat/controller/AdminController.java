@@ -9,6 +9,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class AdminController {
@@ -22,10 +25,35 @@ public class AdminController {
     }
 
     @GetMapping("/admin")
-    public String afficherAccueil(Model model) {
-        // On récupère tous les utilisateurs depuis la base H2
-        // "model" permet de transporter cette liste vers le fichier HTML
-        model.addAttribute("utilisateurs", utilisateurRepository.findAll());
+    public String afficherAccueil(
+            @RequestParam(defaultValue = "") String keyword,
+            @RequestParam(defaultValue = "0") int page, // Page 0 par défaut (première page)
+            @RequestParam(defaultValue = "5") int size, // 5 utilisateurs par page
+            Model model) {
+
+        Page<Utilisateur> pageUtilisateurs;
+
+        // Si le champ de recherche est vide, on cherche tout le monde
+        if (keyword.isEmpty()) {
+            pageUtilisateurs = utilisateurRepository.findAll(PageRequest.of(page, size));
+        }
+        // Sinon, on utilise la méthode de recherche
+        else {
+            pageUtilisateurs = utilisateurRepository
+                    .findByNomContainingIgnoreCaseOrPrenomContainingIgnoreCaseOrEmailContainingIgnoreCase(
+                            keyword, keyword, keyword, PageRequest.of(page, size));
+        }
+
+        // On envoie la liste des utilisateurs de la page actuelle
+        model.addAttribute("utilisateurs", pageUtilisateurs.getContent());
+
+        // On envoie les infos de pagination pour construire les boutons HTML
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", pageUtilisateurs.getTotalPages());
+
+        // On renvoie le mot-clé à la page HTML pour le garder affiché dans la barre de
+        // recherche
+        model.addAttribute("keyword", keyword);
 
         // On dit à Spring d'afficher le fichier templates/admin/accueil.html
         return "admin/accueil";
@@ -79,11 +107,28 @@ public class AdminController {
     }
 
     @GetMapping("/admin/desactives")
-    public String afficherUtilisateursDesactives(Model model) {
-        // On récupère uniquement les utilisateurs dont isActif est à "false"
-        model.addAttribute("utilisateurs", utilisateurRepository.findByIsActif(false));
+    public String afficherUtilisateursDesactives(
+            @RequestParam(defaultValue = "") String keyword,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            Model model) {
 
-        // On renvoie vers la vue correspondante
+        Page<Utilisateur> pageUtilisateurs;
+
+        // Si pas de recherche : on prend tous les désactivés
+        if (keyword.isEmpty()) {
+            pageUtilisateurs = utilisateurRepository.findByIsActifFalse(PageRequest.of(page, size));
+        }
+        // Sinon : on cherche le mot-clé parmi les désactivés
+        else {
+            pageUtilisateurs = utilisateurRepository.searchDesactives(keyword, PageRequest.of(page, size));
+        }
+
+        model.addAttribute("utilisateurs", pageUtilisateurs.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", pageUtilisateurs.getTotalPages());
+        model.addAttribute("keyword", keyword);
+
         return "admin/desactives";
     }
 }

@@ -10,6 +10,13 @@
     <main>
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h3>Utilisateurs Désactivés</h3>
+            <form th:action="@{/admin/desactives}" method="get" class="d-flex w-50">
+                <input type="text" name="keyword" th:value="${keyword}" class="form-control me-2"
+                    placeholder="Rechercher un profil désactivé...">
+                <button type="submit" class="btn btn-outline-primary">Chercher</button>
+                <a th:if="${!keyword.isEmpty()}" th:href="@{/admin/desactives}" class="btn btn-outline-secondary ms-2"
+                    title="Effacer">X</a>
+            </form>
             <a th:href="@{/admin}" class="btn btn-outline-secondary">Retour à l'accueil</a>
         </div>
         <hr>
@@ -62,6 +69,27 @@
                 </tbody>
             </table>
         </div>
+        <nav th:if="${totalPages > 0}" aria-label="Navigation des pages" class="mt-auto pt-3">
+            <ul class="pagination justify-content-center mb-0">
+
+                <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                    <a class="page-link"
+                        th:href="@{/admin/desactives(page=${currentPage - 1}, keyword=${keyword})}">Précédent</a>
+                </li>
+
+                <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                    th:classappend="${currentPage == i} ? 'active'">
+                    <a class="page-link" th:href="@{/admin/desactives(page=${i}, keyword=${keyword})}"
+                        th:text="${i + 1}">1</a>
+                </li>
+
+                <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                    <a class="page-link"
+                        th:href="@{/admin/desactives(page=${currentPage + 1}, keyword=${keyword})}">Suivant</a>
+                </li>
+
+            </ul>
+        </nav>
     </main>
 
 </body>

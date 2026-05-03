@@ -1,14 +1,28 @@
 // Fonction pour générer un mot de passe aléatoire (inspirée du TD)
 function genererMotDePasse() {
-    const chars = "abcdefghijklmnopqrstuvwxyz!@#$%^&*()-+<>ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
-    let pass = "";
-    // On force une longueur de 12 caractères pour être sûr d'avoir un bon mot de passe
-    for (let x = 0; x < 12; x++) {
-        let i = Math.floor(Math.random() * chars.length);
-        pass += chars.charAt(i);
+    const minuscules = "abcdefghijklmnopqrstuvwxyz";
+    const majuscules = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const chiffres = "0123456789";
+
+    const speciaux = "@$!%*?&-+<>";
+
+    const tous = minuscules + majuscules + chiffres + speciaux;
+
+    let passArray = [
+        minuscules[Math.floor(Math.random() * minuscules.length)],
+        majuscules[Math.floor(Math.random() * majuscules.length)],
+        chiffres[Math.floor(Math.random() * chiffres.length)],
+        speciaux[Math.floor(Math.random() * speciaux.length)]
+    ];
+
+    for (let x = 0; x < 8; x++) {
+        passArray.push(tous[Math.floor(Math.random() * tous.length)]);
     }
+
+    passArray.sort(() => Math.random() - 0.5);
+
     // Injecte le résultat dans l'input
-    document.getElementById("motDePasse").value = pass;
+    document.getElementById("motDePasse").value = passArray.join('');
 }
 
 // Interception de la soumission du formulaire pour valider les données
