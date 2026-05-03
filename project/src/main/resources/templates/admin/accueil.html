@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <!-- L'attribut layout:decorate dit à cette page d'utiliser layout.html comme squelette -->
-<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-    layout:decorate="~{layout}">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{admin/layout :: layout(~{::main})}">
 
 <head>
     <title>Accueil - Liste des utilisateurs</title>
@@ -10,7 +9,7 @@
 <body>
 
     <!-- Tout ce qui est dans ce bloc va remplacer la balise <main> du layout.html -->
-    <main layout:fragment="content">
+    <main>
 
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h3>Liste des utilisateurs</h3>
@@ -40,11 +39,11 @@
                     <td th:text="${user.email}">jean.dupont@mail.com</td>
 
                     <!-- Affichage conditionnel (opérateur ternaire) -->
-                    <td th:text="${user.isAdmin ? 'Admin' : 'Utilisateur'}">Utilisateur</td>
+                    <td th:text="${user.admin ? 'Admin' : 'Utilisateur'}">Utilisateur</td>
 
                     <td>
-                        <span th:if="${user.isActif}" class="badge bg-success">Actif</span>
-                        <span th:unless="${user.isActif}" class="badge bg-danger">Désactivé</span>
+                        <span th:if="${user.actif}" class="badge bg-success">Actif</span>
+                        <span th:unless="${user.actif}" class="badge bg-danger">Désactivé</span>
                     </td>
 
                     <td>

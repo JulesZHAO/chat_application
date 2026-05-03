@@ -12,13 +12,18 @@ public class AdminController {
     @Autowired
     private UtilisateurRepository utilisateurRepository;
 
+    @GetMapping("/")
+    public String index() {
+        return "redirect:/admin";
+    }
+
     @GetMapping("/admin")
     public String afficherAccueil(Model model) {
         // On récupère tous les utilisateurs depuis la base H2
         // "model" permet de transporter cette liste vers le fichier HTML
         model.addAttribute("utilisateurs", utilisateurRepository.findAll());
 
-        // On dit à Spring d'afficher le fichier templates/accueil.html
-        return "accueil";
+        // On dit à Spring d'afficher le fichier templates/admin/accueil.html
+        return "admin/accueil";
     }
 }

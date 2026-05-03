@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<html xmlns:th="http://www.thymeleaf.org" th:fragment="layout(content)">
 
 <head>
     <meta charset="UTF-8">
@@ -32,7 +32,7 @@
         </aside>
 
         <!-- Injection du contenu des autres pages -->
-        <main layout:fragment="content">
+        <main th:replace="${content}">
             <!-- Contenu dynamique -->
         </main>
     </div>
