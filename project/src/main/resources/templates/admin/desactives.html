@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html th:replace="~{layout :: layout(~{::main})}" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Utilisateurs Désactivés</title>
+</head>
+
+<body>
+
+    <main>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3>Utilisateurs Désactivés</h3>
+            <form th:action="@{/admin/desactives}" method="get" class="d-flex w-50">
+                <input type="text" name="keyword" th:value="${keyword}" class="form-control me-2"
+                    placeholder="Rechercher un profil désactivé...">
+                <button type="submit" class="btn btn-outline-primary">Chercher</button>
+                <a th:if="${!keyword.isEmpty()}" th:href="@{/admin/desactives}" class="btn btn-outline-secondary ms-2"
+                    title="Effacer">X</a>
+            </form>
+            <a th:href="@{/admin}" class="btn btn-outline-secondary">Retour à l'accueil</a>
+        </div>
+        <hr>
+
+        <div class="table-responsive">
+            <table class="table table-hover border">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Nom</th>
+                        <th>Prénom</th>
+                        <th>Email</th>
+                        <th>Rôle</th>
+                        <th>Statut</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- La boucle lit la liste envoyée par le contrôleur -->
+                    <tr th:each="user : ${utilisateurs}">
+                        <td th:text="${user.id}">1</td>
+                        <td th:text="${user.nom}">Dupont</td>
+                        <td th:text="${user.prenom}">Jean</td>
+                        <td th:text="${user.email}">jean.dupont@mail.com</td>
+
+                        <td th:text="${user.isAdmin ? 'Admin' : 'Utilisateur'}">Utilisateur</td>
+
+                        <td>
+                            <span class="badge bg-danger">Désactivé</span>
+                        </td>
+
+                        <td>
+                            <!--bouton Réactiver -->
+                            <a th:href="@{/admin/users/reactiver/{id}(id=${user.id})}"
+                                class="btn btn-sm btn-success">Réactiver</a>
+
+                            <!-- bouton Supprimer (avec une petite confirmation js) -->
+                            <a th:href="@{/admin/users/supprimer/{id}(id=${user.id})}" class="btn btn-sm btn-danger"
+                                onclick="return confirm('Êtes-vous sûr de vouloir supprimer définitivement cet utilisateur ?');">
+                                Supprimer
+                            </a>
+                        </td>
+                    </tr>
+
+                    <!-- Message si aucun utilisateur n'est désactivé -->
+                    <tr th:if="${#lists.isEmpty(utilisateurs)}">
+                        <td colspan="7" class="text-center text-muted py-4">Aucun utilisateur désactivé pour le moment.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <nav th:if="${totalPages > 0}" aria-label="Navigation des pages" class="mt-auto pt-3">
+            <ul class="pagination justify-content-center mb-0">
+
+                <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                    <a class="page-link"
+                        th:href="@{/admin/desactives(page=${currentPage - 1}, keyword=${keyword})}">Précédent</a>
+                </li>
+
+                <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                    th:classappend="${currentPage == i} ? 'active'">
+                    <a class="page-link" th:href="@{/admin/desactives(page=${i}, keyword=${keyword})}"
+                        th:text="${i + 1}">1</a>
+                </li>
+
+                <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                    <a class="page-link"
+                        th:href="@{/admin/desactives(page=${currentPage + 1}, keyword=${keyword})}">Suivant</a>
+                </li>
+
+            </ul>
+        </nav>
+    </main>
+
+</body>
+
+</html>
