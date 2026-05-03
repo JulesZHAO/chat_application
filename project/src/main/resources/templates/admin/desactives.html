@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html th:replace="~{layout :: layout(~{::main})}" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Utilisateurs Désactivés</title>
+</head>
+
+<body>
+
+    <main>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3>Utilisateurs Désactivés</h3>
+            <a th:href="@{/admin}" class="btn btn-outline-secondary">Retour à l'accueil</a>
+        </div>
+        <hr>
+
+        <div class="table-responsive">
+            <table class="table table-hover border">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Nom</th>
+                        <th>Prénom</th>
+                        <th>Email</th>
+                        <th>Rôle</th>
+                        <th>Statut</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- La boucle lit la liste envoyée par le contrôleur -->
+                    <tr th:each="user : ${utilisateurs}">
+                        <td th:text="${user.id}">1</td>
+                        <td th:text="${user.nom}">Dupont</td>
+                        <td th:text="${user.prenom}">Jean</td>
+                        <td th:text="${user.email}">jean.dupont@mail.com</td>
+
+                        <td th:text="${user.isAdmin ? 'Admin' : 'Utilisateur'}">Utilisateur</td>
+
+                        <td>
+                            <span class="badge bg-danger">Désactivé</span>
+                        </td>
+
+                        <td>
+                            <!--bouton Réactiver -->
+                            <a th:href="@{/admin/users/reactiver/{id}(id=${user.id})}"
+                                class="btn btn-sm btn-success">Réactiver</a>
+
+                            <!-- bouton Supprimer (avec une petite confirmation js) -->
+                            <a th:href="@{/admin/users/supprimer/{id}(id=${user.id})}" class="btn btn-sm btn-danger"
+                                onclick="return confirm('Êtes-vous sûr de vouloir supprimer définitivement cet utilisateur ?');">
+                                Supprimer
+                            </a>
+                        </td>
+                    </tr>
+
+                    <!-- Message si aucun utilisateur n'est désactivé -->
+                    <tr th:if="${#lists.isEmpty(utilisateurs)}">
+                        <td colspan="7" class="text-center text-muted py-4">Aucun utilisateur désactivé pour le moment.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+</body>
+
+</html>

@@ -26,18 +26,18 @@ public class UtilisateurController {
     }
 
     @GetMapping("/{id}")
-    public Optional<Utilisateur> getUtilisateurById(@PathVariable int id) {
+    public Optional<Utilisateur> getUtilisateurById(@PathVariable Long id) {
         return utilisateurRepository.findById(id);
     }
 
     @PutMapping("/{id}")
-    public Utilisateur modifierUtilisateur(@PathVariable int id, @RequestBody Utilisateur nouvelUtilisateur) {
+    public Utilisateur modifierUtilisateur(@PathVariable Long id, @RequestBody Utilisateur nouvelUtilisateur) {
         nouvelUtilisateur.setId(id);
         return utilisateurRepository.save(nouvelUtilisateur);
     }
 
     @DeleteMapping("/{id}")
-    public void supprimerUtilisateur(@PathVariable int id) {
+    public void supprimerUtilisateur(@PathVariable Long id) {
         utilisateurRepository.deleteById(id);
     }
 }
