@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<!-- L'attribut layout:decorate dit à cette page d'utiliser layout.html comme squelette -->
-<html xmlns:th="http://www.thymeleaf.org" th:replace="~{admin/layout :: layout(~{::main})}">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::main})}">
 
 <head>
     <title>Accueil - Liste des utilisateurs</title>
@@ -38,7 +37,6 @@
                     <td th:text="${user.prenom}">Jean</td>
                     <td th:text="${user.email}">jean.dupont@mail.com</td>
 
-                    <!-- Affichage conditionnel (opérateur ternaire) -->
                     <td th:text="${user.admin ? 'Admin' : 'Utilisateur'}">Utilisateur</td>
 
                     <td>
