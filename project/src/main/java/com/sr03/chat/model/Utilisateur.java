@@ -1,5 +1,6 @@
 package com.sr03.chat.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,10 +21,12 @@ public class Utilisateur {
     private boolean isActif = true; // Actif par défaut lors de la création
 
     // Relation 1..n : un utilisateur peut créer plusieurs canaux
+    @JsonIgnore
     @OneToMany(mappedBy = "proprietaire", cascade = CascadeType.ALL)
     private List<Canal> canauxCrees = new ArrayList<>();
 
     // Relation n..n : un utilisateur peut être invité à plusieurs canaux
+    @JsonIgnore
     @ManyToMany(mappedBy = "invites")
     private List<Canal> canauxInvites = new ArrayList<>();
 

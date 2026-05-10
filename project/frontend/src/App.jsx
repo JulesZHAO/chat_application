@@ -1,5 +1,8 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
+import MesSalons from "./components/MesSalons";
+import MesInvitations from "./components/MesInvitations";
+import Planifier from "./components/Planifier";
 
 function App() {
     return (
@@ -23,30 +26,9 @@ function App() {
                     <main className="main-content">
                         <Routes>
                             <Route path="/" element={<Navigate to="/mes-salons" replace />} />
-
-                            <Route path="/planifier" element={
-                                <div className="page-content">
-                                    {/* TODO */}
-                                    <h2>Planifier une discussion</h2>
-                                    <p>Formulaire à venir (Titre, description, date, horaire, durée).</p>
-                                </div>
-                            } />
-
-                            <Route path="/mes-salons" element={
-                                <div className="page-content">
-                                    {/* TODO */}
-                                    <h2>Mes salons de discussion</h2>
-                                    <p>Tableau paginé des salons dont je suis propriétaire à venir.</p>
-                                </div>
-                            } />
-
-                            <Route path="/mes-invitations" element={
-                                <div className="page-content">
-                                    {/* TODO */}
-                                    <h2>Mes invitations</h2>
-                                    <p>Tableau paginé des salons où je suis invité à venir.</p>
-                                </div>
-                            } />
+                            <Route path="/planifier" element={<Planifier />} />
+                            <Route path="/mes-salons" element={<MesSalons />}  />
+                            <Route path="/mes-invitations" element={<MesInvitations />} />
                         </Routes>
                     </main>
                 </div>
