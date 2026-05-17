@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.time.LocalDateTime;
 
@@ -93,6 +94,12 @@ public class LoginController {
     public String logout(HttpSession session) {
         session.invalidate();
         return "redirect:/login";
+    }
+
+    @GetMapping("/moi")
+    @ResponseBody
+    public Utilisateur moi(HttpSession session) {
+        return (Utilisateur) session.getAttribute("utilisateurConnecte");
     }
 
 }

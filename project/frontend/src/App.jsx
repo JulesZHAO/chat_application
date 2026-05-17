@@ -3,6 +3,7 @@ import Navbar from './components/Navbar';
 import MesSalons from "./components/MesSalons";
 import MesInvitations from "./components/MesInvitations";
 import Planifier from "./components/Planifier";
+import Chat from "./components/Chat";
 
 function App() {
     return (
@@ -29,6 +30,7 @@ function App() {
                             <Route path="/planifier" element={<Planifier />} />
                             <Route path="/mes-salons" element={<MesSalons />}  />
                             <Route path="/mes-invitations" element={<MesInvitations />} />
+                            <Route path="/chat/:canalId" element={<Chat />} />
                         </Routes>
                     </main>
                 </div>
