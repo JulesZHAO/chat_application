@@ -30,4 +30,15 @@ public class CanalController {
     public List<Canal> getCanauxParInvite(@PathVariable Long id) {
         return canalRepository.findByInvitesId(id);
     }
+
+    @PutMapping("/{id}")
+    public Canal modifierCanal(@PathVariable Long id, @RequestBody Canal canal) {
+        canal.setId(id);
+        return canalRepository.save(canal);
+    }
+
+    @DeleteMapping("/{id}")
+    public void supprimerCanal(@PathVariable Long id) {
+        canalRepository.deleteById(id);
+    }
 }
