@@ -21,6 +21,11 @@ public class CanalController {
         return canalRepository.save(canal);
     }
 
+    @GetMapping("/{id}")
+    public Optional<Canal> getCanalById(@PathVariable Long id) {
+        return canalRepository.findById(id);
+    }
+
     @GetMapping("/proprietaire/{id}")
     public List<Canal> getCanauxParPropietaire(@PathVariable Long id) {
         return canalRepository.findByProprietaireId(id);
