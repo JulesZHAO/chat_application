@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {useState, useEffect} from "react";
 
 function Planifier() {
     const [titre, setTitre] = useState("");
@@ -6,10 +6,32 @@ function Planifier() {
     const [dateHoraire, setDateHoraire] = useState("");
     const [dureeValidite, setDureeValidite] = useState("");
     const [message, setMessage] = useState("");
+    const [userId, setUserId] = useState(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    useEffect(() => {
+        fetch("/moi")
+            .then(res => res.ok ? res.json() : null)
+            .then(u => setUserId(u?.id ?? null))
+            .catch(() => setUserId(null));
+    }, []);
 
     function handleSubmit(e) {
         e.preventDefault();
+        if (!userId) {
+            setMessage("Utilisateur non connecté.");
+            return;
+        }
+        if (!titre.trim() || !description.trim() || !dateHoraire || !dureeValidite) {
+            setMessage("Tous les champs sont obligatoires.");
+            return;
+        }
+        if (parseInt(dureeValidite) <= 0) {
+            setMessage("La durée doit être supérieure à 0.");
+            return;
+        }
 
+        setIsSubmitting(true);
         fetch('/canaux', {
             method: 'POST',
             headers: {
@@ -20,7 +42,7 @@ function Planifier() {
                 description: description,
                 dateHoraire: dateHoraire,
                 dureeValidite: parseInt(dureeValidite),
-                proprietaire: { id: 1 , isAdmin: false, isActif: false}
+                proprietaireId: userId
             })
         }).then(res => {
             if (res.ok) {
@@ -32,7 +54,8 @@ function Planifier() {
             } else {
                 setMessage('Erreur lors de la creation.');
             }
-        });
+        }).catch(() => setMessage('Erreur de connexion au serveur.'))
+          .finally(() => setIsSubmitting(false));
     }
 
     return (
@@ -48,6 +71,7 @@ function Planifier() {
                         type="text"
                         value={titre}
                         onChange={(e) => setTitre(e.target.value)}
+                        required
                     />
                 </div>
 
@@ -57,6 +81,7 @@ function Planifier() {
                         type="text"
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
+                        required
                     />
                 </div>
 
@@ -66,6 +91,7 @@ function Planifier() {
                         type="datetime-local"
                         value={dateHoraire}
                         onChange={(e) => setDateHoraire(e.target.value)}
+                        required
                     />
                 </div>
 
@@ -75,10 +101,14 @@ function Planifier() {
                         type="number"
                         value={dureeValidite}
                         onChange={(e) => setDureeValidite(e.target.value)}
+                        min="1"
+                        required
                     />
                 </div>
 
-                <button type="submit" className="btn-primary">Créer</button>
+                <button type="submit" className="btn-primary" disabled={isSubmitting}>
+                    {isSubmitting ? "Création..." : "Créer"}
+                </button>
             </form>
         </div>
     );
