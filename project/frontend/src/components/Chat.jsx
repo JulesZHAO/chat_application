@@ -9,12 +9,28 @@ function Chat() {
     const [utilisateursConnectes, setUtilisateursConnectes] = useState([]);
     const [inputMessage, setInputMessage] = useState("");
     const [titreCan, setTitreCanal] = useState("");
+    const [emailInvite, setEmailInvite] = useState("");
+    const [messageInvite, setMessageInvite] = useState("");
+    const [connecte, setConnecte] = useState(false);
+    const [erreur, setErreur] = useState("");
     const clientRef = useRef();
 
     useEffect(() => {
-        fetch("/moi").then(res => res.json()).then(u => setUtilisateur(u.nom));
-        fetch(`/canaux/${canalId}`).then(res => res.json()).then(c => setTitreCanal(c.titre));
-    }, []);
+        fetch("/moi")
+            .then(res => res.ok ? res.json() : null)
+            .then(u => {
+                if (!u) {
+                    setErreur("Utilisateur non connecté.");
+                    return;
+                }
+                setUtilisateur(u.nom);
+            })
+            .catch(() => setErreur("Impossible de récupérer l'utilisateur connecté."));
+        fetch(`/canaux/${canalId}`)
+            .then(res => res.json())
+            .then(c => setTitreCanal(c.titre))
+            .catch(() => setErreur("Impossible de charger le salon."));
+    }, [canalId]);
 
     useEffect(() => {
         if(!utilisateur) return;
@@ -22,6 +38,8 @@ function Chat() {
         const client = new Client({
             brokerURL: 'ws://localhost:8080/chat-ws',
             onConnect: () => {
+                setConnecte(true);
+                setErreur("");
                 // Recevoir les messages du canal
                 client.subscribe(`/topic/canal/${canalId}`, (frame) => {
                     const msg = JSON.parse(frame.body);
@@ -40,6 +58,8 @@ function Chat() {
                     body: JSON.stringify({ expediteur: utilisateur})
                 });
             },
+            onStompError: () => setErreur("Erreur de connexion au chat."),
+            onWebSocketClose: () => setConnecte(false),
         });
 
         client.activate();
@@ -54,6 +74,7 @@ function Chat() {
                 });
             }
             client.deactivate();
+            setConnecte(false);
         };
     }, [canalId, utilisateur]);
 
@@ -65,6 +86,10 @@ function Chat() {
 
     const envoyerMessage = () => {
         if (!inputMessage.trim()) return;
+        if (!clientRef.current?.connected) {
+            setErreur("Le chat n'est pas encore connecté.");
+            return;
+        }
         clientRef.current.publish({
             destination: `/app/canal/${canalId}/send`,
             body: JSON.stringify({
@@ -73,6 +98,17 @@ function Chat() {
             })
         });
         setInputMessage("");
+    };
+
+    const inviter = () => {
+        if (!emailInvite.trim()) return;
+        fetch(`/canaux/${canalId}/inviter?email=${encodeURIComponent(emailInvite)}`, { method: 'POST' })
+            .then(res => res.text())
+            .then(msg => {
+                setMessageInvite(msg);
+                setEmailInvite("");
+                setTimeout(() => setMessageInvite(""), 3000);
+            });
     };
 
     const formatHeure = (heure) => {
@@ -89,11 +125,14 @@ function Chat() {
                 {/* Header */}
                 <div style={{ padding: '16px 20px', background: '#ffffff', borderBottom: '1px solid #e0e0e0' }}>
                     <h2 style={{ margin: 0, fontSize: '17px', fontWeight: '600', color: '#1d1d1f' }}>{titreCan}</h2>
-                    <span style={{ fontSize: '12px', color: '#7a7a7a' }}>{utilisateursConnectes.length} connecté{utilisateursConnectes.length > 1 ? 's' : ''}</span>
+                    <span style={{ fontSize: '12px', color: '#7a7a7a' }}>
+                        {connecte ? `${utilisateursConnectes.length} connecté${utilisateursConnectes.length > 1 ? 's' : ''}` : 'Connexion...'}
+                    </span>
                 </div>
 
                 {/* Messages */}
                 <div style={{ flex: 1, overflowY: 'auto', padding: '20px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    {erreur && <p className="error-message">{erreur}</p>}
                     {messages.map((m, i) => {
                         const estMoi = m.expediteur === utilisateur;
                         return (
@@ -132,8 +171,9 @@ function Chat() {
                         onChange={e => setInputMessage(e.target.value)}
                         onKeyDown={e => e.key === 'Enter' && envoyerMessage()}
                         placeholder="Écrire un message..."
+                        disabled={!connecte}
                     />
-                    <button className="btn-primary" onClick={envoyerMessage}>Envoyer</button>
+                    <button className="btn-primary" onClick={envoyerMessage} disabled={!connecte}>Envoyer</button>
                 </div>
             </div>
 
@@ -144,7 +184,7 @@ function Chat() {
                         Connectés — {utilisateursConnectes.length}
                     </h3>
                 </div>
-                <div style={{ padding: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <div style={{ padding: '12px', display: 'flex', flexDirection: 'column', gap: '8px', flex: 1 }}>
                     {utilisateursConnectes.map((u, i) => (
                         <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '8px 10px', borderRadius: '10px', background: '#f5f5f7' }}>
                             <div style={{ width: '32px', height: '32px', borderRadius: '9999px', background: '#0066cc', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px', fontWeight: '600', flexShrink: 0 }}>
@@ -153,6 +193,21 @@ function Chat() {
                             <span style={{ fontSize: '14px', color: '#1d1d1f', fontWeight: '500' }}>{u}</span>
                         </div>
                     ))}
+                </div>
+
+                {/* Inviter */}
+                <div style={{ padding: '12px', borderTop: '1px solid #e0e0e0' }}>
+                    <p style={{ margin: '0 0 8px', fontSize: '12px', fontWeight: '600', color: '#7a7a7a', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Inviter</p>
+                    <input
+                        type="email"
+                        placeholder="Email"
+                        value={emailInvite}
+                        onChange={e => setEmailInvite(e.target.value)}
+                        onKeyDown={e => e.key === 'Enter' && inviter()}
+                        style={{ width: '100%', padding: '7px 12px', borderRadius: '9999px', border: '1px solid #e0e0e0', fontSize: '13px', outline: 'none', boxSizing: 'border-box', marginBottom: '8px' }}
+                    />
+                    <button className="btn-primary" onClick={inviter} style={{ width: '100%', fontSize: '13px' }}>Inviter</button>
+                    {messageInvite && <p style={{ margin: '6px 0 0', fontSize: '12px', color: '#1f8a65', textAlign: 'center' }}>{messageInvite}</p>}
                 </div>
             </div>
 

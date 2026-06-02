@@ -1,50 +1,117 @@
-import { useEffect, useState, useRef} from "react";
+import { useEffect, useState } from "react";
 
 function MesSalons() {
     const [salons, setSalons] = useState([]);
     const [userId, setUserId] = useState(null);
+    const [chargement, setChargement] = useState(true);
+    const [erreur, setErreur] = useState("");
     const [pageCourante, setPageCourante] = useState(0);
     const parPage = 5;
     const debut = pageCourante * parPage;
     const salonsDelaPage = salons.slice(debut, debut + parPage);
 
     useEffect(() => {
-        fetch("/moi").then(res => res.json()).then(u => setUserId(u.id))
+        fetch("/moi")
+            .then(res => res.ok ? res.json() : null)
+            .then(u => {
+                if (!u?.id) {
+                    setErreur("Utilisateur non connecté.");
+                    setChargement(false);
+                    return;
+                }
+                setUserId(u.id);
+            })
+            .catch(() => {
+                setErreur("Impossible de récupérer l'utilisateur connecté.");
+                setChargement(false);
+            })
     }, []);
 
     useEffect(() => {
         if (!userId) return;
+        setChargement(true);
         fetch(`/canaux/proprietaire/${userId}`)
             .then(res => res.json())
             .then(data => setSalons(data))
+            .catch(() => setErreur("Impossible de charger les salons."))
+            .finally(() => setChargement(false))
     }, [userId])
+
+    const [inviterSalonId, setInviterSalonId] = useState(null);
+    const [emailInvite, setEmailInvite] = useState("");
+    const [messageInvite, setMessageInvite] = useState("");
 
     const supprimerSalon = (id) => {
         fetch(`/canaux/${id}`, { method: 'DELETE' })
             .then(() => setSalons(prev => prev.filter(s => s.id !== id)));
     }
 
+    const inviter = (salonId) => {
+        if (!emailInvite.trim()) return;
+        fetch(`/canaux/${salonId}/inviter?email=${encodeURIComponent(emailInvite)}`, { method: 'POST' })
+            .then(res => res.text())
+            .then(msg => {
+                setMessageInvite(msg);
+                setEmailInvite("");
+                setTimeout(() => setMessageInvite(""), 3000);
+            });
+    }
+
+    const formatDate = (dateHoraire) => {
+        if (!dateHoraire) return "Date non définie";
+        return new Date(dateHoraire).toLocaleString("fr-FR", {
+            dateStyle: "medium",
+            timeStyle: "short"
+        });
+    }
+
     return (
         <div className="page-content">
             <h2>Mes salons de discussion</h2>
 
-            {salons.length === 0 ? (
-                <p>Aucune salon pour le moment.</p>
+            {erreur && <p className="error-message">{erreur}</p>}
+            {chargement && <p>Chargement des salons...</p>}
+
+            {!chargement && salons.length === 0 ? (
+                <p>Aucun salon pour le moment.</p>
             ) : (
                 salonsDelaPage.map(salon => (
-                    <div key={salon.id} className="canal-card">
-                        <div>
-                            <h3>{salon.titre}</h3>
-                            <p>{salon.description}</p>
+                    <div key={salon.id}>
+                        <div className="canal-card">
+                            <div>
+                                <h3>{salon.titre}</h3>
+                                <p>{salon.description}</p>
+                                <p className="canal-meta">{formatDate(salon.dateHoraire)} · {salon.dureeValidite} min</p>
+                            </div>
+                            <div className="canal-card-actions">
+                                <button className="btn-primary" onClick={() => window.open(`/chat/${salon.id}`, '_blank')}>
+                                    Rejoindre
+                                </button>
+                                <button className="btn-secondary" onClick={() => {
+                                    setInviterSalonId(inviterSalonId === salon.id ? null : salon.id);
+                                    setEmailInvite("");
+                                    setMessageInvite("");
+                                }}>
+                                    Inviter
+                                </button>
+                                <button className="btn-secondary" style={{ color: '#cf2d56', borderColor: '#cf2d56' }} onClick={() => supprimerSalon(salon.id)}>
+                                    Supprimer
+                                </button>
+                            </div>
                         </div>
-                        <div className="canal-card-actions">
-                            <button className="btn-primary" onClick={() => window.open(`/chat/${salon.id}`, '_blank')}>
-                                Rejoindre
-                            </button>
-                            <button className="btn-secondary" style={{ color: '#cf2d56', borderColor: '#cf2d56' }} onClick={() => supprimerSalon(salon.id)}>
-                                Supprimer
-                            </button>
-                        </div>
+                        {inviterSalonId === salon.id && (
+                            <div className="invite-panel">
+                                <input
+                                    type="email"
+                                    placeholder="Email de l'invité"
+                                    value={emailInvite}
+                                    onChange={e => setEmailInvite(e.target.value)}
+                                    onKeyDown={e => e.key === 'Enter' && inviter(salon.id)}
+                                />
+                                <button className="btn-primary" onClick={() => inviter(salon.id)}>Envoyer</button>
+                                {messageInvite && <span>{messageInvite}</span>}
+                            </div>
+                        )}
                     </div>
                 ))
             )}
