@@ -3,26 +3,56 @@ import { useEffect, useState} from "react";
 function MesInvitations() {
     const [invitations, setInvitations] = useState([]);
     const [userId, setUserId] = useState(null);
+    const [chargement, setChargement] = useState(true);
+    const [erreur, setErreur] = useState("");
     const [pageCourante, setPageCourante] = useState(0);
     const parPage = 3;
     const debut = pageCourante * parPage;
     const invitationsDelaPage = invitations.slice(debut, debut + parPage);
 
     useEffect(() => {
-        fetch("/moi").then(res => res.json()).then(u => setUserId(u.id))
+        fetch("/moi")
+            .then(res => res.ok ? res.json() : null)
+            .then(u => {
+                if (!u?.id) {
+                    setErreur("Utilisateur non connecté.");
+                    setChargement(false);
+                    return;
+                }
+                setUserId(u.id);
+            })
+            .catch(() => {
+                setErreur("Impossible de récupérer l'utilisateur connecté.");
+                setChargement(false);
+            })
     }, []);
 
     useEffect(() => {
         if (!userId) return;
+        setChargement(true);
         fetch(`/canaux/invite/${userId}`)
             .then(res => res.json())
             .then(data => setInvitations(data))
+            .catch(() => setErreur("Impossible de charger les invitations."))
+            .finally(() => setChargement(false))
     }, [userId])
+
+    const formatDate = (dateHoraire) => {
+        if (!dateHoraire) return "Date non définie";
+        return new Date(dateHoraire).toLocaleString("fr-FR", {
+            dateStyle: "medium",
+            timeStyle: "short"
+        });
+    }
+
     return (
         <div className="page-content">
             <h2>Mes invitations</h2>
 
-            {invitations.length === 0 ? (
+            {erreur && <p className="error-message">{erreur}</p>}
+            {chargement && <p>Chargement des invitations...</p>}
+
+            {!chargement && invitations.length === 0 ? (
                 <p>Aucune invitation pour le moment.</p>
             ) : (
                 invitationsDelaPage.map(invitation => (
@@ -30,6 +60,7 @@ function MesInvitations() {
                         <div>
                             <h3>{invitation.titre}</h3>
                             <p>{invitation.description}</p>
+                            <p className="canal-meta">{formatDate(invitation.dateHoraire)} · {invitation.dureeValidite} min</p>
                         </div>
                         <div className="canal-card-actions">
                             <button className="btn-primary" onClick={() => window.open(`/chat/${invitation.id}`, '_blank')}>

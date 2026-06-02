@@ -71,8 +71,15 @@ body {
 
 .info-card hr {
   border: 0;
-  border-top: 1px solid var(--border-color);
+  border-top: 1px solid var(--hairline);
   margin-bottom: 15px;
+}
+
+.sidebar-muted {
+  color: var(--ink-muted-48);
+  font-size: 14px;
+  margin-top: 6px;
+  overflow-wrap: anywhere;
 }
 
 /* La partie dynamique (contenu) */
@@ -143,6 +150,42 @@ body {
   color: var(--ink-muted-80);
 }
 
+.canal-meta {
+  color: var(--ink-muted-48) !important;
+  font-size: 12px !important;
+  margin-top: 4px;
+}
+
+.invite-panel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: -4px 0 12px;
+  padding: 10px 12px;
+  background: var(--surface-pearl);
+  border: 1px solid var(--hairline);
+  border-radius: 11px;
+}
+
+.invite-panel input {
+  flex: 1;
+  min-width: 180px;
+  padding: 8px 12px;
+  border: 1px solid var(--hairline);
+  border-radius: 9999px;
+  font-size: 14px;
+  outline: none;
+}
+
+.invite-panel input:focus {
+  border-color: var(--primary-focus);
+}
+
+.invite-panel span {
+  color: var(--semantic-success);
+  font-size: 13px;
+}
+
 /* --- FORM --- */
 .form-group {
   margin-bottom: 20px;
@@ -189,6 +232,12 @@ body {
 
 .btn-primary:active {
   transform: scale(0.95);
+}
+
+.btn-primary:disabled {
+  background-color: var(--ink-muted-48);
+  cursor: not-allowed;
+  transform: none;
 }
 
 .btn-secondary {

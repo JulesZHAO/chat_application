@@ -4,8 +4,18 @@ import MesSalons from "./components/MesSalons";
 import MesInvitations from "./components/MesInvitations";
 import Planifier from "./components/Planifier";
 import Chat from "./components/Chat";
+import { useEffect, useState } from "react";
 
 function App() {
+    const [utilisateur, setUtilisateur] = useState(null);
+
+    useEffect(() => {
+        fetch("/moi")
+            .then(res => res.ok ? res.json() : null)
+            .then(data => setUtilisateur(data))
+            .catch(() => setUtilisateur(null));
+    }, []);
+
     return (
         <Router>
             <div className="app-container">
@@ -19,7 +29,8 @@ function App() {
                         <div className="info-card">
                             <h4>Informations</h4>
                             <hr />
-                            <p>Connecté : <strong>Utilisateur</strong></p>
+                            <p>Connecté : <strong>{utilisateur ? `${utilisateur.prenom} ${utilisateur.nom}` : "Non connecté"}</strong></p>
+                            {utilisateur?.email && <p className="sidebar-muted">{utilisateur.email}</p>}
                         </div>
                     </aside>
 
