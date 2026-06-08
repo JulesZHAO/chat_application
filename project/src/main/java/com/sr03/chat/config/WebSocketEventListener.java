@@ -43,6 +43,15 @@ public class WebSocketEventListener {
                     
                 logger.info("Utilisateur '{}' connecté au salon {}", utilisateur, canalId);
                 diffuserUtilisateurs(canalId);
+
+                // Envoyer un message système
+                com.sr03.chat.model.Message systemMessage = new com.sr03.chat.model.Message(
+                        utilisateur + " a rejoint le chat.",
+                        java.time.LocalTime.now(),
+                        "Système"
+                );
+                messagingTemplate.convertAndSend("/topic/canal/" + canalId, systemMessage);
+
             } catch (NumberFormatException e) {
                 logger.error("CanalId invalide lors de la connexion websocket: {}", canalIdStr);
             }
@@ -64,6 +73,33 @@ public class WebSocketEventListener {
             }
             logger.info("Utilisateur '{}' déconnecté du salon {}", userInfo.getUtilisateur(), userInfo.getCanalId());
             diffuserUtilisateurs(userInfo.getCanalId());
+
+            // Envoyer un message système
+            com.sr03.chat.model.Message systemMessage = new com.sr03.chat.model.Message(
+                    userInfo.getUtilisateur() + " a quitté le chat.",
+                    java.time.LocalTime.now(),
+                    "Système"
+            );
+            messagingTemplate.convertAndSend("/topic/canal/" + userInfo.getCanalId(), systemMessage);
+        }
+    }
+
+    @EventListener
+    public void handleWebSocketSubscribeListener(org.springframework.web.socket.messaging.SessionSubscribeEvent event) {
+        StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
+        String destination = headerAccessor.getDestination();
+        
+        if (destination != null && destination.startsWith("/topic/canal/") && destination.endsWith("/utilisateurs")) {
+            // Extraire le canalId de la destination "/topic/canal/{canalId}/utilisateurs"
+            try {
+                String[] parts = destination.split("/");
+                if (parts.length >= 5) {
+                    Long canalId = Long.parseLong(parts[3]);
+                    diffuserUtilisateurs(canalId);
+                }
+            } catch (NumberFormatException e) {
+                logger.warn("Impossible d'extraire le canalId de la destination: {}", destination);
+            }
         }
     }
 
