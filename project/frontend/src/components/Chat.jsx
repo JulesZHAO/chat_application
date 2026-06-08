@@ -37,6 +37,10 @@ function Chat() {
 
         const client = new Client({
             brokerURL: 'ws://localhost:8080/chat-ws',
+            connectHeaders: {
+                utilisateur: utilisateur,
+                canalId: canalId
+            },
             onConnect: () => {
                 setConnecte(true);
                 setErreur("");
@@ -51,12 +55,6 @@ function Chat() {
                     const users = JSON.parse(frame.body);
                     setUtilisateursConnectes(users);
                 });
-
-                // Annoncer sa connexion
-                client.publish({
-                    destination: `/app/canal/${canalId}/rejoindre`,
-                    body: JSON.stringify({ expediteur: utilisateur})
-                });
             },
             onStompError: () => setErreur("Erreur de connexion au chat."),
             onWebSocketClose: () => setConnecte(false),
@@ -66,13 +64,6 @@ function Chat() {
         clientRef.current = client;
 
         return () => {
-            // Annocer sa deconnnextion
-            if (clientRef.current?.connected) {
-                clientRef.current.publish({
-                    destination: `/app/canal/${canalId}/quitter`,
-                    body: JSON.stringify({ expediteur: utilisateur })
-                });
-            }
             client.deactivate();
             setConnecte(false);
         };
