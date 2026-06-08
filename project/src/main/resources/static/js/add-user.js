@@ -25,6 +25,12 @@ function genererMotDePasse() {
     document.getElementById("motDePasse").value = passArray.join('');
 }
 
+// Relier genererMotDePasse avec btn-generer
+const btnGenerer = document.getElementById("btn-generer");
+if (btnGenerer) {
+    btnGenerer.addEventListener("click", genererMotDePasse);
+}
+
 // Interception de la soumission du formulaire pour valider les données
 document.getElementById("form-ajout-user").addEventListener("submit", function (event) {
     let isValid = true;

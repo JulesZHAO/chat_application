@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion - SR03</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+    <style>
+        .login-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f4f7f6;
+        }
+        .login-card {
+            width: 100%;
+            max-width: 420px;
+            padding: 40px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border-top: 4px solid #3498db;
+        }
+        .login-title {
+            color: #2c3e50;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .login-subtitle {
+            color: #888;
+            font-size: 14px;
+            margin-bottom: 28px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="login-wrapper">
+    <div class="login-card">
+        <h2 class="login-title">Salon de discussion</h2>
+        <p class="login-subtitle">Connectez-vous à l'espace administrateur</p>
+
+        <!-- Message d'erreur envoyé par le contrôleur -->
+        <div th:if="${erreur}" class="alert alert-danger" th:text="${erreur}"></div>
+
+        <!-- Message de succès (ex: après réinitialisation du mot de passe) -->
+        <div th:if="${succes}" class="alert alert-success" th:text="${succes}"></div>
+
+        <form th:action="@{/login}" method="post">
+
+            <div class="mb-3">
+                <label for="email" class="form-label">Adresse email</label>
+                <input type="email" class="form-control" id="email" name="email"
+                       placeholder="admin@example.com" required autofocus>
+            </div>
+
+            <div class="mb-3">
+                <label for="motDePasse" class="form-label">Mot de passe</label>
+                <input type="password" class="form-control" id="motDePasse" name="motDePasse"
+                       placeholder="••••••••" required minlength="8">
+            </div>
+
+            <div class="d-grid mt-4">
+                <button type="submit" class="btn btn-primary">Se connecter</button>
+            </div>
+
+        </form>
+
+        <div class="text-center mt-3">
+            <a th:href="@{/mot-de-passe-oublie}" style="font-size: 14px; color: #3498db;">
+                Mot de passe oublié ?
+            </a>
+        </div>
+    </div>
+    </div>
+
+    <footer style="position: fixed; bottom: 0; width: 100%; background-color: #2c3e50;
+                   color: #bdc3c7; text-align: center; padding: 12px; font-size: 13px;">
+        SR03 Salon de discussion 2026 - Gaspard PETRI - Zhenyu ZHAO
+    </footer>
+
+</body>
+
+</html>

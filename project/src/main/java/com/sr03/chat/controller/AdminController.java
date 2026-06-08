@@ -2,9 +2,12 @@ package com.sr03.chat.controller;
 
 import com.sr03.chat.model.Utilisateur;
 import com.sr03.chat.repository.UtilisateurRepository;
+import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -19,8 +22,15 @@ public class AdminController {
     @Autowired
     private UtilisateurRepository utilisateurRepository;
 
+    // Vérifie si un admin est connecté en cherchant son objet dans la session
+    private boolean estConnecte(HttpSession session) {
+        return session.getAttribute("utilisateurConnecte") != null;
+    }
+
     @GetMapping("/")
-    public String index() {
+    public String index(HttpSession session) {
+        // Redirige vers la connexion si pas de session active
+        if (!estConnecte(session)) return "redirect:/login";
         return "redirect:/admin";
     }
 
@@ -29,7 +39,11 @@ public class AdminController {
             @RequestParam(defaultValue = "") String keyword,
             @RequestParam(defaultValue = "0") int page, // Page 0 par défaut (première page)
             @RequestParam(defaultValue = "5") int size, // 5 utilisateurs par page
-            Model model) {
+            Model model,
+            HttpSession session) {
+
+        // Redirige vers la connexion si pas de session active
+        if (!estConnecte(session)) return "redirect:/login";
 
         Page<Utilisateur> pageUtilisateurs;
 
@@ -60,7 +74,11 @@ public class AdminController {
     }
 
     @GetMapping("/admin/users/editer/{id}")
-    public String afficherFormulaireEdition(@PathVariable Long id, Model model) {
+    public String afficherFormulaireEdition(@PathVariable Long id, Model model, HttpSession session) {
+
+        // Redirige vers la connexion si pas de session active
+        if (!estConnecte(session)) return "redirect:/login";
+
         // On cherche l'utilisateur
         Utilisateur utilisateur = utilisateurRepository.findById(id).orElse(null);
 
@@ -74,18 +92,28 @@ public class AdminController {
     }
 
     @PostMapping("/admin/users/editer/{id}")
-    public String mettreAJourUtilisateur(@PathVariable Long id, @ModelAttribute Utilisateur utilisateur) {
-        // On s'assure que l'ID est bien conservé pour faire la maj
+    public String mettreAJourUtilisateur(@PathVariable Long id,
+                                         @Valid @ModelAttribute Utilisateur utilisateur,
+                                         BindingResult result,
+                                         HttpSession session) {
+
+        // Redirige vers la connexion si pas de session active
+        if (!estConnecte(session)) return "redirect:/login";
+
+        if (result.hasErrors()) {
+            return "admin/edit-user";
+        }
+
         utilisateur.setId(id);
-
-        // On sauvegarde par-dessus l'ancien
         utilisateurRepository.save(utilisateur);
-
         return "redirect:/admin";
     }
 
     @GetMapping("/admin/users/desactiver/{id}")
-    public String desactiverUtilisateur(@PathVariable Long id) {
+    public String desactiverUtilisateur(@PathVariable Long id, HttpSession session) {
+        // Redirige vers la connexion si pas de session active
+        if (!estConnecte(session)) return "redirect:/login";
+
         // On cherche l'utilisateur par son ID
         Utilisateur utilisateur = utilisateurRepository.findById(id).orElse(null);
         if (utilisateur != null) {
@@ -98,7 +126,11 @@ public class AdminController {
     }
 
     @GetMapping("/admin/users/reactiver/{id}")
-    public String reactiverUtilisateur(@PathVariable Long id) {
+    public String reactiverUtilisateur(@PathVariable Long id, HttpSession session) {
+
+        // Redirige vers la connexion si pas de session active
+        if (!estConnecte(session)) return "redirect:/login";
+
         Utilisateur utilisateur = utilisateurRepository.findById(id).orElse(null);
         if (utilisateur != null) {
             // On le rend actif et on sauvegarde
@@ -110,21 +142,40 @@ public class AdminController {
     }
 
     @GetMapping("/admin/users/supprimer/{id}")
-    public String supprimerUtilisateur(@PathVariable Long id) {
+    public String supprimerUtilisateur(@PathVariable Long id, HttpSession session) {
+
+        // Redirige vers la connexion si pas de session active
+        if (!estConnecte(session)) return "redirect:/login";
+
         // On le supprime définitivement de la base de données
         utilisateurRepository.deleteById(id);
         return "redirect:/admin/desactives";
     }
 
     @GetMapping("/admin/users/add")
-    public String afficherFormulaire(Model model) {
+    public String afficherFormulaire(Model model, HttpSession session) {
+
+        // Redirige vers la connexion si pas de session active
+        if (!estConnecte(session)) return "redirect:/login";
+
         // On crée un utilisateur vide pour que le formulaire HTML puisse s'y lier
         model.addAttribute("utilisateur", new Utilisateur());
         return "admin/add-user";
     }
 
     @PostMapping("/admin/users/add")
-    public String sauvegarderUtilisateur(@ModelAttribute Utilisateur utilisateur) {
+    public String sauvegarderUtilisateur(@Valid @ModelAttribute Utilisateur utilisateur,
+                                         BindingResult result,
+                                         HttpSession session) {
+
+        // Redirige vers la connexion si pas de session active
+        if (!estConnecte(session)) return "redirect:/login";
+
+        // S'il y a des erreurs de validation, on retourne au formulaire
+        if (result.hasErrors()) {
+            return "admin/add-user";
+        }
+
         // Le bouton "Submit" envoie les données ici. On sauvegarde en base de données.
         utilisateurRepository.save(utilisateur);
         // On redirige vers la page d'accueil pour voir le tableau mis à jour
@@ -136,7 +187,11 @@ public class AdminController {
             @RequestParam(defaultValue = "") String keyword,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size,
-            Model model) {
+            Model model,
+            HttpSession session) {
+
+        // Redirige vers la connexion si pas de session active
+        if (!estConnecte(session)) return "redirect:/login";
 
         Page<Utilisateur> pageUtilisateurs;
 

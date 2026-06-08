@@ -20,18 +20,21 @@
                     <input type="text" class="form-control" th:field="*{nom}" id="nom" required minlength="2"
                         maxlength="50">
                     <div class="invalid-feedback" id="nom-error">Le nom ne doit contenir que des lettres.</div>
+                    <div th:if="${#fields.hasErrors('nom')}" class="text-danger" th:errors="*{nom}"></div>
                 </div>
                 <div class="col-md-6">
                     <label class="form-label">Prénom</label>
                     <input type="text" class="form-control" th:field="*{prenom}" id="prenom" required minlength="2"
                         maxlength="50">
                     <div class="invalid-feedback" id="prenom-error">Le prénom ne doit contenir que des lettres.</div>
+                    <div th:if="${#fields.hasErrors('prenom')}" class="text-danger" th:errors="*{prenom}"></div>
                 </div>
             </div>
 
             <div class="mb-3">
                 <label class="form-label">Adresse Email</label>
                 <input type="email" class="form-control" th:field="*{email}" required>
+                <div th:if="${#fields.hasErrors('email')}" class="text-danger" th:errors="*{email}"></div>
             </div>
 
             <div class="mb-3">
@@ -39,6 +42,7 @@
                 <div class="input-group">
                     <input type="text" class="form-control" th:field="*{motDePasse}" id="motDePasse" required
                         minlength="8">
+                    <div th:if="${#fields.hasErrors('motDePasse')}" class="text-danger" th:errors="*{motDePasse}"></div>
                     <!-- Bouton pour générer le mot de passe aléatoire -->
                     <button class="btn btn-outline-secondary" type="button"
                         onclick="genererMotDePasse()">Générer</button>
