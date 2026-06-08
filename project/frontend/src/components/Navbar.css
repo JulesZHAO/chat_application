@@ -1,0 +1,50 @@
+.top-banner {
+    background-color: var(--surface-black);
+    color: var(--on-dark);
+    text-align: center;
+    padding: 0;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.top-banner h1 {
+    margin: 0;
+    font-size: 40px;
+    font-weight: 600;
+    letter-spacing: 0.231px;
+    color: var(--on-dark);
+}
+
+.navbar-dark {
+    background-color: var(--canvas-parchment);
+    display: flex;
+    justify-content: center;
+    padding: 0;
+    height: 52px;
+    align-items: center;
+    border-bottom: 1px solid var(--hairline);
+}
+
+.navbar-links {
+    list-style: none;
+    display: flex;
+    gap: 40px;
+    margin: 0;
+    padding: 0;
+}
+
+.navbar-links a {
+    text-decoration: none;
+    color: var(--ink);
+    font-weight: 400;
+    font-size: 12px;
+    letter-spacing: -0.12px;
+    transition: color 0.2s;
+}
+
+.navbar-links a:hover,
+.navbar-links a.active {
+    color: var(--primary);
+}

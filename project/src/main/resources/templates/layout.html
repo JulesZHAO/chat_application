@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:fragment="layout(content)">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administration - SR03</title>
+
+    <!--Intégration de Bootstrap-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+</head>
+
+<body>
+
+    <header>
+        <h2>Salon de discussion</h2>
+        <nav>
+            <!-- Liens de navigation Thymeleaf -->
+            <a th:href="@{/admin}">Accueil (Gérer les utilisateurs)</a>
+            <a th:href="@{/admin/desactives}">Utilisateurs désactivés</a>
+            <a th:href="@{/admin/users/add}">Nouveau utilisateur</a>
+        </nav>
+    </header>
+
+    <div class="content-wrapper">
+        <aside>
+            <h4>Informations</h4>
+            <p>Connecté : <strong>Admin</strong></p>
+        </aside>
+
+        <!-- Injection du contenu des autres pages -->
+        <main th:replace="${content}">
+            <!-- Contenu dynamique -->
+        </main>
+    </div>
+
+    <footer>
+        <p>SR03 Salon de discussion 2026 - Gaspard PETRI - Zhenyu ZHAO</p>
+    </footer>
+
+</body>
+
+</html>

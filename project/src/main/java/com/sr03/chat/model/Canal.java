@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import jakarta.persistence.FetchType;
 
 @Entity
 @Table(name = "canaux")
@@ -24,7 +25,7 @@ public class Canal {
     private Utilisateur proprietaire;
 
     // Relation n..n : un canal possède une liste d'invités
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "canal_invitations", joinColumns = @JoinColumn(name = "canal_id"), inverseJoinColumns = @JoinColumn(name = "utilisateur_id"))
     private List<Utilisateur> invites = new ArrayList<>();
 

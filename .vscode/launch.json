@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-ChatApplication<sr03_app_salon_discussion>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.sr03.chat.ChatApplication",
+            "projectName": "sr03_app_salon_discussion",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}
